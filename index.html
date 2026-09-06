@@ -1,37 +1,1203 @@
-<!doctype html><html lang="ru"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ЧистоеДело</title><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<title>ЧистоеДело</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
-:root{--bg:var(--tg-theme-bg-color,#f5f5f5);--text:var(--tg-theme-text-color,#222);--hint:var(--tg-theme-hint-color,#777);--card:var(--tg-theme-secondary-bg-color,#fff);--button:var(--tg-theme-button-color,#2481cc);--button-text:var(--tg-theme-button-text-color,#fff)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}.wrap{max-width:620px;margin:auto;padding:18px}.brand{font-size:27px;font-weight:800;margin:5px 0 4px}.sub{color:var(--hint);margin-bottom:20px}.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px}.label{font-size:14px;color:var(--hint);margin:0 0 8px}.services{display:grid;grid-template-columns:1fr 1fr;gap:10px}.service{border:2px solid transparent;background:var(--bg);border-radius:13px;padding:14px 10px;cursor:pointer;color:var(--text);font-size:14px;text-align:left}.service.active{border-color:var(--button)}.service b{display:block;font-size:16px;margin-bottom:5px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:12px}input,select{width:100%;padding:13px;border:1px solid #bbb;border-radius:11px;background:var(--bg);color:var(--text);font-size:16px}.price{font-size:22px;font-weight:800}.btn{width:100%;border:0;border-radius:13px;padding:15px;background:var(--button);color:var(--button-text);font-size:17px;font-weight:700;cursor:pointer}.hidden{display:none}.success{text-align:center;padding:35px 15px}.success .icon{font-size:55px}.orderid{font-weight:800;font-size:20px;margin:12px 0}.summary{text-align:left;background:var(--bg);border-radius:13px;padding:14px;line-height:1.65}.error{color:#c62828;font-size:14px;margin-top:10px}
-</style></head><body><div class="wrap">
-<div id="formScreen"><div class="brand">🧹 ЧистоеДело</div><div class="sub">Специалист найдётся рядом.</div>
-<div class="card"><div class="label">Выберите услугу</div><div class="services" id="services">
-<button class="service active" data-service="Уборка квартиры" data-base="1500" data-rate="15"><b>🏠 Уборка квартиры</b>от 1 500 ₽</button>
-<button class="service" data-service="Генеральная уборка" data-base="2500" data-rate="25"><b>✨ Генеральная</b>от 2 500 ₽</button>
-<button class="service" data-service="Уборка офиса" data-base="2000" data-rate="20"><b>🏢 Уборка офиса</b>от 2 000 ₽</button>
-<button class="service" data-service="После ремонта" data-base="4000" data-rate="35"><b>🧱 После ремонта</b>от 4 000 ₽</button>
-<button class="service" data-service="Мытьё окон" data-base="1500" data-rate="18"><b>🪟 Мытьё окон</b>от 1 500 ₽</button>
-<button class="service" data-service="Химчистка мебели" data-base="2000" data-rate="30"><b>🛋️ Химчистка мебели</b>от 2 000 ₽</button>
-</div></div>
-<div class="card"><div class="grid"><div class="field"><div class="label">Площадь, м²</div><input id="area" type="number" min="10" value="50"></div><div class="field"><div class="label">Санузлы</div><select id="bathrooms"><option>1</option><option>2</option><option>3</option><option>4</option></select></div></div>
-<div class="field"><div class="label">Адрес</div><input id="address" placeholder="Улица, дом, квартира"></div><div class="grid"><div class="field"><div class="label">Дата</div><input id="date" type="date"></div><div class="field"><div class="label">Время</div><input id="time" type="time" value="10:00"></div></div></div>
-<div class="card"><div class="label">Предварительная стоимость</div><div class="price" id="price">от 2 250 ₽</div></div>
-<button class="btn" id="submit">🔎 Найти специалиста</button><div class="error" id="error"></div></div>
-<div id="successScreen" class="hidden"><div class="card success"><div class="icon">✅</div><h2>Заказ принят!</h2><div class="orderid" id="successId"></div><div class="sub">Заявка передана на поиск специалиста.</div><div class="summary" id="summary"></div><br><button class="btn" id="newOrder">Создать ещё один заказ</button></div></div>
+:root{
+  --bg:var(--tg-theme-bg-color,#f5f5f5);
+  --text:var(--tg-theme-text-color,#222);
+  --hint:var(--tg-theme-hint-color,#777);
+  --card:var(--tg-theme-secondary-bg-color,#fff);
+  --button:var(--tg-theme-button-color,#2481cc);
+  --button-text:var(--tg-theme-button-text-color,#fff)
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif
+}
+
+.wrap{
+  max-width:620px;
+  margin:auto;
+  padding:18px
+}
+
+.brand{
+  font-size:27px;
+  font-weight:800;
+  margin:5px 0 4px
+}
+
+.sub{
+  color:var(--hint);
+  margin-bottom:20px
+}
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px
+}
+
+.label{
+  font-size:14px;
+  color:var(--hint);
+  margin:0 0 8px
+}
+
+.services{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+
+.service{
+  border:2px solid transparent;
+  background:var(--bg);
+  border-radius:13px;
+  padding:14px 10px;
+  cursor:pointer;
+  color:var(--text);
+  font-size:14px;
+  text-align:left
+}
+
+.service.active{
+  border-color:var(--button)
+}
+
+.service b{
+  display:block;
+  font-size:16px;
+  margin-bottom:5px
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px
+}
+
+.field{
+  margin-bottom:12px
+}
+
+input,select{
+  width:100%;
+  padding:13px;
+  border:1px solid #bbb;
+  border-radius:11px;
+  background:var(--bg);
+  color:var(--text);
+  font-size:16px
+}
+
+.price{
+  font-size:22px;
+  font-weight:800
+}
+
+.btn{
+  width:100%;
+  border:0;
+  border-radius:13px;
+  padding:15px;
+  background:var(--button);
+  color:var(--button-text);
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer
+}
+
+.btn-secondary{
+  width:100%;
+  border:2px solid var(--button);
+  border-radius:13px;
+  padding:14px;
+  background:transparent;
+  color:var(--button);
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer;
+  margin-top:10px
+}
+
+.hidden{
+  display:none
+}
+
+.success{
+  text-align:center;
+  padding:35px 15px
+}
+
+.success .icon{
+  font-size:55px
+}
+
+.orderid{
+  font-weight:800;
+  font-size:20px;
+  margin:12px 0
+}
+
+.summary{
+  text-align:left;
+  background:var(--bg);
+  border-radius:13px;
+  padding:14px;
+  line-height:1.65
+}
+
+.error{
+  color:#c62828;
+  font-size:14px;
+  margin-top:10px
+}
+
+.back{
+  margin-bottom:15px;
+  cursor:pointer;
+  color:var(--button);
+  font-weight:700
+}
+
+.title{
+  font-size:23px;
+  font-weight:800;
+  margin-bottom:7px
+}
+
+.info{
+  color:var(--hint);
+  font-size:14px;
+  line-height:1.5;
+  margin-bottom:18px
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<!-- ================================= -->
+<!-- ГЛАВНЫЙ ЭКРАН / ЗАКАЗ -->
+<!-- ================================= -->
+
+<div id="formScreen">
+
+  <div class="brand">🧹 ЧистоеДело</div>
+
+  <div class="sub">
+    Специалист найдётся рядом.
+  </div>
+
+  <div class="card">
+
+    <div class="label">
+      Выберите услугу
+    </div>
+
+    <div class="services" id="services">
+
+      <button class="service active"
+        data-service="Уборка квартиры"
+        data-base="1500"
+        data-rate="15">
+
+        <b>🏠 Уборка квартиры</b>
+        от 1 500 ₽
+
+      </button>
+
+      <button class="service"
+        data-service="Генеральная уборка"
+        data-base="2500"
+        data-rate="25">
+
+        <b>✨ Генеральная</b>
+        от 2 500 ₽
+
+      </button>
+
+      <button class="service"
+        data-service="Уборка офиса"
+        data-base="2000"
+        data-rate="20">
+
+        <b>🏢 Уборка офиса</b>
+        от 2 000 ₽
+
+      </button>
+
+      <button class="service"
+        data-service="После ремонта"
+        data-base="4000"
+        data-rate="35">
+
+        <b>🧱 После ремонта</b>
+        от 4 000 ₽
+
+      </button>
+
+      <button class="service"
+        data-service="Мытьё окон"
+        data-base="1500"
+        data-rate="18">
+
+        <b>🪟 Мытьё окон</b>
+        от 1 500 ₽
+
+      </button>
+
+      <button class="service"
+        data-service="Химчистка мебели"
+        data-base="2000"
+        data-rate="30">
+
+        <b>🛋️ Химчистка мебели</b>
+        от 2 000 ₽
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="grid">
+
+      <div class="field">
+
+        <div class="label">
+          Площадь, м²
+        </div>
+
+        <input
+          id="area"
+          type="number"
+          min="10"
+          value="50"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          Санузлы
+        </div>
+
+        <select id="bathrooms">
+
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <div class="label">
+        Адрес
+      </div>
+
+      <input
+        id="address"
+        placeholder="Улица, дом, квартира"
+      >
+
+    </div>
+
+
+    <div class="grid">
+
+      <div class="field">
+
+        <div class="label">
+          Дата
+        </div>
+
+        <input
+          id="date"
+          type="date"
+        >
+
+      </div>
+
+
+      <div class="field">
+
+        <div class="label">
+          Время
+        </div>
+
+        <input
+          id="time"
+          type="time"
+          value="10:00"
+        >
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="label">
+      Предварительная стоимость
+    </div>
+
+    <div class="price" id="price">
+      от 2 250 ₽
+    </div>
+
+  </div>
+
+
+  <button class="btn" id="submit">
+    🔎 Найти специалиста
+  </button>
+
+  <button class="btn-secondary" id="specialistButton">
+    👨‍🔧 Стать специалистом
+  </button>
+
+  <div class="error" id="error"></div>
+
 </div>
+
+
+<!-- ================================= -->
+<!-- РЕГИСТРАЦИЯ СПЕЦИАЛИСТА -->
+<!-- ================================= -->
+
+<div id="specialistScreen" class="hidden">
+
+  <div class="back" id="backToOrder">
+    ← Вернуться к заказу
+  </div>
+
+  <div class="card">
+
+    <div class="title">
+      👨‍🔧 Стать специалистом
+    </div>
+
+    <div class="info">
+      Заполните данные. После проверки мы свяжемся с вами и подключим к заказам.
+    </div>
+
+
+    <div class="field">
+
+      <div class="label">
+        Ваше имя
+      </div>
+
+      <input
+        id="specialistName"
+        type="text"
+        placeholder="Например, Иван"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <div class="label">
+        Телефон
+      </div>
+
+      <input
+        id="specialistPhone"
+        type="tel"
+        placeholder="+7 900 000-00-00"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <div class="label">
+        Какие услуги оказываете?
+      </div>
+
+      <select id="specialistServices">
+
+        <option value="">
+          Выберите услугу
+        </option>
+
+        <option value="Уборка квартир">
+          🏠 Уборка квартир
+        </option>
+
+        <option value="Генеральная уборка">
+          ✨ Генеральная уборка
+        </option>
+
+        <option value="Уборка офисов">
+          🏢 Уборка офисов
+        </option>
+
+        <option value="Уборка после ремонта">
+          🧱 После ремонта
+        </option>
+
+        <option value="Мытьё окон">
+          🪟 Мытьё окон
+        </option>
+
+        <option value="Химчистка мебели">
+          🛋️ Химчистка мебели
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <div class="label">
+        Район работы
+      </div>
+
+      <input
+        id="specialistArea"
+        type="text"
+        placeholder="Например, Москва, ЦАО"
+      >
+
+    </div>
+
+
+    <button class="btn" id="specialistSubmit">
+      📨 Отправить заявку
+    </button>
+
+    <div class="error" id="specialistError"></div>
+
+  </div>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- УСПЕШНЫЙ ЗАКАЗ -->
+<!-- ================================= -->
+
+<div id="successScreen" class="hidden">
+
+  <div class="card success">
+
+    <div class="icon">
+      ✅
+    </div>
+
+    <h2>
+      Заказ принят!
+    </h2>
+
+    <div class="orderid" id="successId"></div>
+
+    <div class="sub">
+      Заявка передана на поиск специалиста.
+    </div>
+
+    <div class="summary" id="summary"></div>
+
+    <br>
+
+    <button class="btn" id="newOrder">
+      Создать ещё один заказ
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- УСПЕШНАЯ РЕГИСТРАЦИЯ -->
+<!-- ================================= -->
+
+<div id="specialistSuccessScreen" class="hidden">
+
+  <div class="card success">
+
+    <div class="icon">
+      ✅
+    </div>
+
+    <h2>
+      Заявка отправлена!
+    </h2>
+
+    <div class="orderid" id="specialistSuccessId"></div>
+
+    <div class="sub">
+      Ваша анкета отправлена на проверку.
+    </div>
+
+    <div class="summary">
+
+      👨‍🔧 Статус:
+      <b>На проверке</b>
+
+      <br><br>
+
+      После одобрения с вами свяжутся через Telegram.
+
+    </div>
+
+    <br>
+
+    <button class="btn" id="backAfterSpecialist">
+      Вернуться в меню
+    </button>
+
+  </div>
+
+</div>
+
+</div>
+
+
 <script>
-const SERVER_URL='https://script.google.com/macros/s/AKfycbyw0lhnqNj-3FUMUxqlPvFRybfesJPk30Tb-58PFos6RXW77CGGgTaA8CZp-vozC-8hjQ/exec';
-const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();}
-document.getElementById('date').value=new Date().toISOString().slice(0,10);let selected=document.querySelector('.service.active');
-document.querySelectorAll('.service').forEach(b=>b.onclick=()=>{document.querySelectorAll('.service').forEach(x=>x.classList.remove('active'));b.classList.add('active');selected=b;calculate()});
-['area','bathrooms'].forEach(id=>document.getElementById(id).oninput=calculate);
-function calculate(){const a=Math.max(0,Number(area.value)||0),ba=Number(bathrooms.value)||1,p=Number(selected.dataset.base)+Math.max(0,a-30)*Number(selected.dataset.rate)+Math.max(0,ba-1)*300;price.textContent='от '+Math.round(p).toLocaleString('ru-RU')+' ₽';return Math.round(p)}
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-submit.onclick=async()=>{error.textContent='';const a=Number(area.value)||0;if(a<10){error.textContent='Укажите площадь не менее 10 м².';return}if(!address.value.trim()){error.textContent='Укажите адрес.';return}if(!date.value||!time.value){error.textContent='Укажите дату и время.';return}
-const order={id:'CD-'+String(Date.now()).slice(-8),service:selected.dataset.service,area:a,bathrooms:Number(bathrooms.value),address:address.value.trim(),date:date.value,time:time.value,price_from:calculate(),created_at:new Date().toISOString(),telegram_user:tg?.initDataUnsafe?.user||{}};
-submit.disabled=true;submit.textContent='⏳ Отправляем заказ...';
-try{await fetch(SERVER_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)});showSuccess(order)}catch(e){error.textContent='Не удалось отправить заказ. Проверьте интернет и попробуйте ещё раз.'}finally{submit.disabled=false;submit.textContent='🔎 Найти специалиста'}};
-function showSuccess(o){localStorage.setItem('chistoeDeloLastOrder',JSON.stringify(o));successId.textContent='Заказ №'+o.id;summary.innerHTML='<b>🧽 '+esc(o.service)+'</b><br>📐 '+o.area+' м² · 🚿 '+o.bathrooms+' сануз.<br>📍 '+esc(o.address)+'<br>📅 '+o.date+' · 🕐 '+o.time+'<br>💰 от '+o.price_from.toLocaleString('ru-RU')+' ₽';formScreen.classList.add('hidden');successScreen.classList.remove('hidden');scrollTo(0,0)}
-newOrder.onclick=()=>{successScreen.classList.add('hidden');formScreen.classList.remove('hidden');address.value='';scrollTo(0,0)};calculate();
-</script></body></html>
+
+const SERVER_URL =
+'https://script.google.com/macros/s/AKfycbyw0lhnqNj-3FUMUxqlPvFRybfesJPk30Tb-58PFos6RXW77CGGgTaA8CZp-vozC-8hjQ/exec';
+
+
+const tg =
+window.Telegram &&
+window.Telegram.WebApp;
+
+
+if(tg){
+
+  tg.ready();
+
+  tg.expand();
+
+}
+
+
+// ==========================================
+// ЭЛЕМЕНТЫ
+// ==========================================
+
+const formScreen =
+document.getElementById('formScreen');
+
+const specialistScreen =
+document.getElementById('specialistScreen');
+
+const successScreen =
+document.getElementById('successScreen');
+
+const specialistSuccessScreen =
+document.getElementById('specialistSuccessScreen');
+
+const area =
+document.getElementById('area');
+
+const bathrooms =
+document.getElementById('bathrooms');
+
+const address =
+document.getElementById('address');
+
+const date =
+document.getElementById('date');
+
+const time =
+document.getElementById('time');
+
+const price =
+document.getElementById('price');
+
+const submit =
+document.getElementById('submit');
+
+const error =
+document.getElementById('error');
+
+
+// ==========================================
+// ДАТА
+// ==========================================
+
+date.value =
+new Date().toISOString().slice(0,10);
+
+
+// ==========================================
+// УСЛУГИ
+// ==========================================
+
+let selected =
+document.querySelector('.service.active');
+
+
+document
+.querySelectorAll('.service')
+.forEach(b => {
+
+  b.onclick = () => {
+
+    document
+    .querySelectorAll('.service')
+    .forEach(x =>
+      x.classList.remove('active')
+    );
+
+    b.classList.add('active');
+
+    selected = b;
+
+    calculate();
+
+  };
+
+});
+
+
+// ==========================================
+// РАСЧЁТ
+// ==========================================
+
+['area','bathrooms']
+.forEach(id =>
+  document.getElementById(id)
+  .addEventListener('input',calculate)
+);
+
+
+function calculate(){
+
+  const a =
+    Math.max(0,Number(area.value)||0);
+
+  const ba =
+    Number(bathrooms.value)||1;
+
+  const p =
+    Number(selected.dataset.base) +
+
+    Math.max(0,a-30) *
+    Number(selected.dataset.rate) +
+
+    Math.max(0,ba-1) *
+    300;
+
+  price.textContent =
+    'от ' +
+    Math.round(p)
+    .toLocaleString('ru-RU') +
+    ' ₽';
+
+  return Math.round(p);
+
+}
+
+
+// ==========================================
+// ЭКРАН СПЕЦИАЛИСТА
+// ==========================================
+
+document
+.getElementById('specialistButton')
+.onclick = () => {
+
+  formScreen.classList.add('hidden');
+
+  specialistScreen.classList.remove('hidden');
+
+  specialistError.textContent='';
+
+  scrollTo(0,0);
+
+};
+
+
+document
+.getElementById('backToOrder')
+.onclick = () => {
+
+  specialistScreen.classList.add('hidden');
+
+  formScreen.classList.remove('hidden');
+
+  scrollTo(0,0);
+
+};
+
+
+// ==========================================
+// РЕГИСТРАЦИЯ СПЕЦИАЛИСТА
+// ==========================================
+
+document
+.getElementById('specialistSubmit')
+.onclick = async () => {
+
+  const specialistError =
+    document.getElementById('specialistError');
+
+
+  specialistError.textContent='';
+
+
+  const name =
+    document.getElementById('specialistName')
+    .value.trim();
+
+
+  const phone =
+    document.getElementById('specialistPhone')
+    .value.trim();
+
+
+  const services =
+    document.getElementById('specialistServices')
+    .value;
+
+
+  const specialistArea =
+    document.getElementById('specialistArea')
+    .value.trim();
+
+
+  if(!name){
+
+    specialistError.textContent =
+      'Укажите ваше имя.';
+
+    return;
+
+  }
+
+
+  if(!phone){
+
+    specialistError.textContent =
+      'Укажите номер телефона.';
+
+    return;
+
+  }
+
+
+  if(!services){
+
+    specialistError.textContent =
+      'Выберите услугу.';
+
+    return;
+
+  }
+
+
+  if(!specialistArea){
+
+    specialistError.textContent =
+      'Укажите район работы.';
+
+    return;
+
+  }
+
+
+  const specialist = {
+
+    type:
+      'specialist_registration',
+
+    name:
+      name,
+
+    phone:
+      phone,
+
+    services:
+      services,
+
+    area:
+      specialistArea,
+
+    created_at:
+      new Date().toISOString(),
+
+    telegram_user:
+      tg?.initDataUnsafe?.user || {}
+
+  };
+
+
+  const button =
+    document.getElementById('specialistSubmit');
+
+
+  button.disabled = true;
+
+  button.textContent =
+    '⏳ Отправляем заявку...';
+
+
+  try{
+
+    await fetch(
+
+      SERVER_URL,
+
+      {
+
+        method:'POST',
+
+        mode:'no-cors',
+
+        headers:{
+          'Content-Type':
+          'text/plain;charset=utf-8'
+        },
+
+        body:
+          JSON.stringify(specialist)
+
+      }
+
+    );
+
+
+    const specialistId =
+      'SP-' +
+      String(Date.now())
+      .slice(-8);
+
+
+    document
+    .getElementById('specialistSuccessId')
+    .textContent =
+      'Заявка №' +
+      specialistId;
+
+
+    specialistScreen
+    .classList.add('hidden');
+
+
+    specialistSuccessScreen
+    .classList.remove('hidden');
+
+
+    scrollTo(0,0);
+
+
+  }catch(e){
+
+    specialistError.textContent =
+      'Не удалось отправить заявку. Проверьте интернет и попробуйте ещё раз.';
+
+  }finally{
+
+    button.disabled=false;
+
+    button.textContent =
+      '📨 Отправить заявку';
+
+  }
+
+};
+
+
+// ==========================================
+// ЗАКАЗ
+// ==========================================
+
+function esc(s){
+
+  return String(s)
+  .replace(/[&<>"']/g,m => ({
+
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+
+  }[m]));
+
+}
+
+
+submit.onclick = async () => {
+
+  error.textContent='';
+
+
+  const a =
+    Number(area.value)||0;
+
+
+  if(a<10){
+
+    error.textContent =
+      'Укажите площадь не менее 10 м².';
+
+    return;
+
+  }
+
+
+  if(!address.value.trim()){
+
+    error.textContent =
+      'Укажите адрес.';
+
+    return;
+
+  }
+
+
+  if(!date.value ||
+     !time.value){
+
+    error.textContent =
+      'Укажите дату и время.';
+
+    return;
+
+  }
+
+
+  const order = {
+
+    id:
+      'CD-' +
+      String(Date.now()).slice(-8),
+
+    service:
+      selected.dataset.service,
+
+    area:
+      a,
+
+    bathrooms:
+      Number(bathrooms.value),
+
+    address:
+      address.value.trim(),
+
+    date:
+      date.value,
+
+    time:
+      time.value,
+
+    price_from:
+      calculate(),
+
+    created_at:
+      new Date().toISOString(),
+
+    telegram_user:
+      tg?.initDataUnsafe?.user || {}
+
+  };
+
+
+  submit.disabled=true;
+
+  submit.textContent =
+    '⏳ Отправляем заказ...';
+
+
+  try{
+
+    await fetch(
+
+      SERVER_URL,
+
+      {
+
+        method:'POST',
+
+        mode:'no-cors',
+
+        headers:{
+          'Content-Type':
+          'text/plain;charset=utf-8'
+        },
+
+        body:
+          JSON.stringify(order)
+
+      }
+
+    );
+
+
+    showSuccess(order);
+
+
+  }catch(e){
+
+    error.textContent =
+      'Не удалось отправить заказ. Проверьте интернет и попробуйте ещё раз.';
+
+  }finally{
+
+    submit.disabled=false;
+
+    submit.textContent =
+      '🔎 Найти специалиста';
+
+  }
+
+};
+
+
+// ==========================================
+// УСПЕШНЫЙ ЗАКАЗ
+// ==========================================
+
+function showSuccess(o){
+
+  localStorage.setItem(
+    'chistoeDeloLastOrder',
+    JSON.stringify(o)
+  );
+
+
+  document
+  .getElementById('successId')
+  .textContent =
+    'Заказ №' +
+    o.id;
+
+
+  document
+  .getElementById('summary')
+  .innerHTML =
+
+    '<b>🧽 ' +
+    esc(o.service) +
+    '</b><br>' +
+
+    '📐 ' +
+    o.area +
+    ' м² · 🚿 ' +
+    o.bathrooms +
+    ' сануз.<br>' +
+
+    '📍 ' +
+    esc(o.address) +
+    '<br>' +
+
+    '📅 ' +
+    o.date +
+    ' · 🕐 ' +
+    o.time +
+    '<br>' +
+
+    '💰 от ' +
+    o.price_from
+    .toLocaleString('ru-RU') +
+    ' ₽';
+
+
+  formScreen
+  .classList.add('hidden');
+
+
+  successScreen
+  .classList.remove('hidden');
+
+
+  scrollTo(0,0);
+
+}
+
+
+// ==========================================
+// НОВЫЙ ЗАКАЗ
+// ==========================================
+
+document
+.getElementById('newOrder')
+.onclick = () => {
+
+  successScreen
+  .classList.add('hidden');
+
+  formScreen
+  .classList.remove('hidden');
+
+  address.value='';
+
+  scrollTo(0,0);
+
+};
+
+
+// ==========================================
+// ПОСЛЕ РЕГИСТРАЦИИ
+// ==========================================
+
+document
+.getElementById('backAfterSpecialist')
+.onclick = () => {
+
+  specialistSuccessScreen
+  .classList.add('hidden');
+
+  formScreen
+  .classList.remove('hidden');
+
+  scrollTo(0,0);
+
+};
+
+
+// ==========================================
+// СТАРТ
+// ==========================================
+
+calculate();
+
+</script>
+
+</body>
+</html>
