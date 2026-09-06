@@ -1,0 +1,37 @@
+<!doctype html><html lang="ru"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ЧистоеДело</title><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:var(--tg-theme-bg-color,#f5f5f5);--text:var(--tg-theme-text-color,#222);--hint:var(--tg-theme-hint-color,#777);--card:var(--tg-theme-secondary-bg-color,#fff);--button:var(--tg-theme-button-color,#2481cc);--button-text:var(--tg-theme-button-text-color,#fff)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}.wrap{max-width:620px;margin:auto;padding:18px}.brand{font-size:27px;font-weight:800;margin:5px 0 4px}.sub{color:var(--hint);margin-bottom:20px}.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px}.label{font-size:14px;color:var(--hint);margin:0 0 8px}.services{display:grid;grid-template-columns:1fr 1fr;gap:10px}.service{border:2px solid transparent;background:var(--bg);border-radius:13px;padding:14px 10px;cursor:pointer;color:var(--text);font-size:14px;text-align:left}.service.active{border-color:var(--button)}.service b{display:block;font-size:16px;margin-bottom:5px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:12px}input,select{width:100%;padding:13px;border:1px solid #bbb;border-radius:11px;background:var(--bg);color:var(--text);font-size:16px}.price{font-size:22px;font-weight:800}.btn{width:100%;border:0;border-radius:13px;padding:15px;background:var(--button);color:var(--button-text);font-size:17px;font-weight:700;cursor:pointer}.hidden{display:none}.success{text-align:center;padding:35px 15px}.success .icon{font-size:55px}.orderid{font-weight:800;font-size:20px;margin:12px 0}.summary{text-align:left;background:var(--bg);border-radius:13px;padding:14px;line-height:1.65}.error{color:#c62828;font-size:14px;margin-top:10px}
+</style></head><body><div class="wrap">
+<div id="formScreen"><div class="brand">🧹 ЧистоеДело</div><div class="sub">Специалист найдётся рядом.</div>
+<div class="card"><div class="label">Выберите услугу</div><div class="services" id="services">
+<button class="service active" data-service="Уборка квартиры" data-base="1500" data-rate="15"><b>🏠 Уборка квартиры</b>от 1 500 ₽</button>
+<button class="service" data-service="Генеральная уборка" data-base="2500" data-rate="25"><b>✨ Генеральная</b>от 2 500 ₽</button>
+<button class="service" data-service="Уборка офиса" data-base="2000" data-rate="20"><b>🏢 Уборка офиса</b>от 2 000 ₽</button>
+<button class="service" data-service="После ремонта" data-base="4000" data-rate="35"><b>🧱 После ремонта</b>от 4 000 ₽</button>
+<button class="service" data-service="Мытьё окон" data-base="1500" data-rate="18"><b>🪟 Мытьё окон</b>от 1 500 ₽</button>
+<button class="service" data-service="Химчистка мебели" data-base="2000" data-rate="30"><b>🛋️ Химчистка мебели</b>от 2 000 ₽</button>
+</div></div>
+<div class="card"><div class="grid"><div class="field"><div class="label">Площадь, м²</div><input id="area" type="number" min="10" value="50"></div><div class="field"><div class="label">Санузлы</div><select id="bathrooms"><option>1</option><option>2</option><option>3</option><option>4</option></select></div></div>
+<div class="field"><div class="label">Адрес</div><input id="address" placeholder="Улица, дом, квартира"></div><div class="grid"><div class="field"><div class="label">Дата</div><input id="date" type="date"></div><div class="field"><div class="label">Время</div><input id="time" type="time" value="10:00"></div></div></div>
+<div class="card"><div class="label">Предварительная стоимость</div><div class="price" id="price">от 2 250 ₽</div></div>
+<button class="btn" id="submit">🔎 Найти специалиста</button><div class="error" id="error"></div></div>
+<div id="successScreen" class="hidden"><div class="card success"><div class="icon">✅</div><h2>Заказ принят!</h2><div class="orderid" id="successId"></div><div class="sub">Заявка передана на поиск специалиста.</div><div class="summary" id="summary"></div><br><button class="btn" id="newOrder">Создать ещё один заказ</button></div></div>
+</div>
+<script>
+const SERVER_URL='https://script.google.com/macros/s/AKfycbyw0lhnqNj-3FUMUxqlPvFRybfesJPk30Tb-58PFos6RXW77CGGgTaA8CZp-vozC-8hjQ/exec';
+const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();}
+document.getElementById('date').value=new Date().toISOString().slice(0,10);let selected=document.querySelector('.service.active');
+document.querySelectorAll('.service').forEach(b=>b.onclick=()=>{document.querySelectorAll('.service').forEach(x=>x.classList.remove('active'));b.classList.add('active');selected=b;calculate()});
+['area','bathrooms'].forEach(id=>document.getElementById(id).oninput=calculate);
+function calculate(){const a=Math.max(0,Number(area.value)||0),ba=Number(bathrooms.value)||1,p=Number(selected.dataset.base)+Math.max(0,a-30)*Number(selected.dataset.rate)+Math.max(0,ba-1)*300;price.textContent='от '+Math.round(p).toLocaleString('ru-RU')+' ₽';return Math.round(p)}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+submit.onclick=async()=>{error.textContent='';const a=Number(area.value)||0;if(a<10){error.textContent='Укажите площадь не менее 10 м².';return}if(!address.value.trim()){error.textContent='Укажите адрес.';return}if(!date.value||!time.value){error.textContent='Укажите дату и время.';return}
+const order={id:'CD-'+String(Date.now()).slice(-8),service:selected.dataset.service,area:a,bathrooms:Number(bathrooms.value),address:address.value.trim(),date:date.value,time:time.value,price_from:calculate(),created_at:new Date().toISOString(),telegram_user:tg?.initDataUnsafe?.user||{}};
+submit.disabled=true;submit.textContent='⏳ Отправляем заказ...';
+try{await fetch(SERVER_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)});showSuccess(order)}catch(e){error.textContent='Не удалось отправить заказ. Проверьте интернет и попробуйте ещё раз.'}finally{submit.disabled=false;submit.textContent='🔎 Найти специалиста'}};
+function showSuccess(o){localStorage.setItem('chistoeDeloLastOrder',JSON.stringify(o));successId.textContent='Заказ №'+o.id;summary.innerHTML='<b>🧽 '+esc(o.service)+'</b><br>📐 '+o.area+' м² · 🚿 '+o.bathrooms+' сануз.<br>📍 '+esc(o.address)+'<br>📅 '+o.date+' · 🕐 '+o.time+'<br>💰 от '+o.price_from.toLocaleString('ru-RU')+' ₽';formScreen.classList.add('hidden');successScreen.classList.remove('hidden');scrollTo(0,0)}
+newOrder.onclick=()=>{successScreen.classList.add('hidden');formScreen.classList.remove('hidden');address.value='';scrollTo(0,0)};calculate();
+</script></body></html>
